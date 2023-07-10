@@ -77,6 +77,7 @@ compile-macos:
 
 compile-macos-x86:
 	mkdir -p dist/x86
+	gcc -O1 $(MACOS_FLAGS) src/ta/*.c -o dist/arm64/ta.dylib -target  x86_64-apple-macos10.12
 	gcc -O1 $(MACOS_FLAGS) src/sqlite3-crypto.c src/crypto/*.c -o dist/x86/crypto.dylib -target x86_64-apple-macos10.12
 	gcc -O3 $(MACOS_FLAGS) src/sqlite3-define.c src/define/*.c -o dist/x86/define.dylib -target x86_64-apple-macos10.12
 	gcc -O3 $(MACOS_FLAGS) src/sqlite3-fileio.c src/fileio/*.c -o dist/x86/fileio.dylib -target x86_64-apple-macos10.12
@@ -93,6 +94,7 @@ compile-macos-x86:
 
 compile-macos-arm64:
 	mkdir -p dist/arm64
+	gcc -O1 $(MACOS_FLAGS) src/ta/*.c -o dist/arm64/ta.dylib -target arm64-apple-macos11
 	gcc -O1 $(MACOS_FLAGS) src/sqlite3-crypto.c src/crypto/*.c -o dist/arm64/crypto.dylib -target arm64-apple-macos11
 	gcc -O3 $(MACOS_FLAGS) src/sqlite3-define.c src/define/*.c -o dist/arm64/define.dylib -target arm64-apple-macos11
 	gcc -O3 $(MACOS_FLAGS) src/sqlite3-fileio.c src/fileio/*.c -o dist/arm64/fileio.dylib -target arm64-apple-macos11
