@@ -1,8 +1,6 @@
 
 #include <math.h>
 #include <stddef.h>
-#undef SQLITE_OMIT_LOAD_EXTENSION
-#undef SQLITE_CORE
 #include <sqlite3ext.h>
 
 
@@ -34,7 +32,7 @@ static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
 
     sqlite3_result_pointer(context, maCtx, "MovingAvgContext", NULL);
   } else {
-    maCtx = (MovingAvgContext *)sqlite3_user_data(sqlite3_context_db_handle(context));
+    maCtx = (MovingAvgContext *)sqlite3_value_pointer(argv[0], "EMACtx");
 
     if (maCtx->count < maCtx->windowSize) {
       double currentValue = sqlite3_value_double(argv[0]);
@@ -54,7 +52,7 @@ static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
 }
 
 static void smaFinal(sqlite3_context *context) {
-  MovingAvgContext *maCtx = (MovingAvgContext *)sqlite3_user_data(sqlite3_context_db_handle(context));
+  MovingAvgContext *maCtx = (MovingAvgContext *)sqlite3_value_pointer(sqlite3_context_value(context), "EMACtx");
 
   if (maCtx != NULL && maCtx->count > 0) {
     sqlite3_result_double(context, maCtx->sum / maCtx->count);
@@ -82,7 +80,7 @@ static void emaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
 
     sqlite3_result_pointer(context, emaCtx, "EMACtx", NULL);
   } else {
-    emaCtx = (EMACtx *)sqlite3_user_data(sqlite3_context_db_handle(context));
+    emaCtx = (EMACtx *)sqlite3_value_pointer(argv[0], "EMACtx");
 
     if (emaCtx->count == 0) {
       // 第一个值为初始EMA
@@ -100,7 +98,8 @@ static void emaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
 }
 
 static void emaFinal(sqlite3_context *context) {
-  EMACtx *emaCtx = (EMACtx *)sqlite3_user_data(sqlite3_context_db_handle(context));
+  EMACtx *emaCtx = (EMACtx *)sqlite3_value_pointer(sqlite3_context_value(context), "EMACtx");
+
 
   if (emaCtx != NULL && emaCtx->count > 0) {
     sqlite3_result_double(context, emaCtx->prevEMA);
@@ -118,8 +117,8 @@ static void emaValueDestructor(void *p) {
 int sqlite3_extension_init(sqlite3 *db, char **errmsg, const sqlite3_api_routines *api) {
   SQLITE_EXTENSION_INIT2(api);
 
-  sqlite3_create_window_function_v2(db, "sma", 1, SQLITE_UTF8, NULL, smaStep, smaFinal, NULL, smaValueDestructor);
-  sqlite3_create_window_function_v2(db, "ema", 2, SQLITE_UTF8, NULL, emaStep, emaFinal, NULL, emaValueDestructor);
+  sqlite3_create_window_function(db, "sma", 1, SQLITE_UTF8, NULL, smaStep, smaFinal, NULL,NULL, smaValueDestructor);
+  sqlite3_create_window_function(db, "ema", 2, SQLITE_UTF8, NULL, emaStep, emaFinal, NULL,NULL, emaValueDestructor);
 
   return SQLITE_OK;
 }
