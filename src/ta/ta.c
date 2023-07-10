@@ -1,8 +1,12 @@
-#include <sqlite3ext.h>
+
 #include <math.h>
 #include <stddef.h>
+#undef SQLITE_OMIT_LOAD_EXTENSION
+#undef SQLITE_CORE
+#include <sqlite3ext.h>
 
-SQLITE_EXTENSION_INIT3
+
+
 
 typedef struct MovingAvgContext {
   int windowSize;
