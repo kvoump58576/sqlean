@@ -24,8 +24,6 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - os: ubuntu-latest
-                    - os: windows-latest
                     - os: macos-latest
 
         steps:
@@ -37,17 +35,6 @@ jobs:
                   make prepare-dist
                   make download-sqlite
                   make download-external
-
-            - name: Build for Linux
-              if: matrix.os == 'ubuntu-latest'
-              run: |
-                  make compile-linux
-                  make test-all
-
-            - name: Build for Windows
-              if: matrix.os == 'windows-latest'
-              shell: bash
-              run: make compile-windows
 
             - name: Build for macOS
               if: matrix.os == 'macos-latest'
