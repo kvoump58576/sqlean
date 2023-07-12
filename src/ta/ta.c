@@ -51,9 +51,8 @@ static void smaFinalize(sqlite3_context *context) {
 
 
 int sqlite3_extension_init(sqlite3 *db, char **err, const sqlite3_api_routines *api) {
-  SQLITE_EXTENSION_INIT2(api);
 
-  int rc = sqlite3_create_window_function(
+  int rc = api->create_window_function(
     db,
     "sma",
     2,
