@@ -35,13 +35,14 @@ static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
     windowData->sum -= windowData->values[index];
     windowData->values[index] = value;
     windowData->sum += value; 
-
-    double sma = windowData->sum / windowData->window;
-
-    sqlite3_result_double(context, sma);
   }
 }
 
+static void smaValue(sqlite3_context* context){
+  WindowData *windowData = sqlite3_aggregate_context(context, sizeof(WindowData));
+  double sma = windowData->sum / windowData->window;
+  sqlite3_result_double(context, sma);
+}
 
 static void smaFinalize(sqlite3_context *context) {
   WindowData *windowData = sqlite3_aggregate_context(context, sizeof(WindowData));

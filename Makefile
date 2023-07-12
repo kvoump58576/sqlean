@@ -8,6 +8,8 @@ SQLITE_VERSION := 3360000
 SQLITE_BRANCH := 3.36
 
 SQLEAN_VERSION := '"$(or $(shell git tag --points-at HEAD),main)"'
+BUILD_VERSION := '$(shell git log -n 1 --pretty=format:"%h")'
+
 
 LINIX_FLAGS := -Wall -Wsign-compare -Wno-unknown-pragmas -fPIC -shared -Isrc -DSQLEAN_VERSION=$(SQLEAN_VERSION)
 WINDO_FLAGS := -shared -Isrc -DSQLEAN_VERSION=$(SQLEAN_VERSION)
@@ -110,8 +112,8 @@ compile-macos-arm64:
 	gcc -O1 $(MACOS_FLAGS) -include src/regexp/constants.h src/sqlite3-sqlean.c src/crypto/*.c src/define/*.c src/fileio/*.c src/fuzzy/*.c src/ipaddr/*.c src/math/*.c src/regexp/*.c src/regexp/pcre2/*.c src/stats/*.c src/text/*.c src/unicode/*.c src/uuid/*.c src/vsv/*.c -o dist/arm64/sqlean.dylib -target arm64-apple-macos11 -lm
 
 pack-macos:
-	zip -j dist/sqlean-macos-x86.zip dist/x86/*.dylib
-	zip -j dist/sqlean-macos-arm64.zip dist/arm64/*.dylib
+	zip -j dist/sqlean-macos-x86-${BUILD_VERSION}.zip dist/x86/*.dylib
+	zip -j dist/sqlean-macos-arm64-${BUILD_VERSION}.zip dist/arm64/*.dylib
 
 test-all:
 	make test suite=crypto
