@@ -1,7 +1,7 @@
 #include <stdio.h>
 // #include <sqlite3.h>
 #include <sqlite3ext.h>
-
+SQLITE_EXTENSION_INIT1
 typedef struct {
   int count;
   int window;
@@ -51,8 +51,8 @@ static void smaFinalize(sqlite3_context *context) {
 
 
 int sqlite3_extension_init(sqlite3 *db, char **err, const sqlite3_api_routines *api) {
-
-  int rc = api->create_window_function(
+  SQLITE_EXTENSION_INIT2(api);
+  int rc = sqlite3_create_window_function(
     db,
     "sma",
     2,
