@@ -66,7 +66,6 @@ int sqlite3_extension_init(sqlite3 *db, char **err, const sqlite3_api_routines *
     NULL
   );
   if (rc != SQLITE_OK) {
-    *err = sqlite3_mprintf("Failed to create 'sma' function: %s", sqlite3_errmsg(db));
     return rc;
   }
 
