@@ -77,7 +77,7 @@ compile-macos:
 
 compile-macos-x86:
 	mkdir -p dist/x86
-	gcc -O1 $(MACOS_FLAGS) src/ta/*.c -o dist/arm64/ta.dylib -target  x86_64-apple-macos10.12
+	gcc -O1 $(MACOS_FLAGS) src/ta/*.c -o dist/x86/ta.dylib -target  x86_64-apple-macos10.12
 	gcc -O1 $(MACOS_FLAGS) src/sqlite3-crypto.c src/crypto/*.c -o dist/x86/crypto.dylib -target x86_64-apple-macos10.12
 	gcc -O3 $(MACOS_FLAGS) src/sqlite3-define.c src/define/*.c -o dist/x86/define.dylib -target x86_64-apple-macos10.12
 	gcc -O3 $(MACOS_FLAGS) src/sqlite3-fileio.c src/fileio/*.c -o dist/x86/fileio.dylib -target x86_64-apple-macos10.12
