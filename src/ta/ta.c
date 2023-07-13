@@ -3,7 +3,7 @@
 SQLITE_EXTENSION_INIT1
 
 static void emaFinalize(sqlite3_context *context) {}
-static void inverse(sqlite3_context *context, int, sqlite3_value **value) {}
+static void inverse(sqlite3_context *context, int argc, sqlite3_value **value) {}
 static void destroy(void *context) {}
 
 typedef struct {
@@ -42,11 +42,13 @@ static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
         smaContext->sum -= smaContext->values[index];
         smaContext->values[index] = value;
         smaContext->sum += value;
+        smaContext->count++;
     }
 }
 static void smaValue(sqlite3_context *context) {
     SmaContext *smaContext = (SmaContext *)sqlite3_aggregate_context(context, sizeof(SmaContext));
-    sqlite3_result_double(context, keep3digits(smaContext->sum / smaContext->count));
+    int count=smaContext->count>smaContext->window?smaContext->window:smaContext->count;
+    sqlite3_result_double(context, keep3digits(smaContext->sum / count));
 }
 static void smaFinalize(sqlite3_context *context) {
     SmaContext *smaContext = (SmaContext *)sqlite3_aggregate_context(context, sizeof(SmaContext));
