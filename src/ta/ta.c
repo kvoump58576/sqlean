@@ -13,7 +13,7 @@ typedef struct {
     double *values;
 } SmaContext;
 
-inline double keep3digits(double value) { return (int)(value * 1000) / 1000.0; }
+static inline double keep3digits(double value) { return (int)(value * 1000) / 1000.0; }
 
 static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
     if (argc != 2) {
