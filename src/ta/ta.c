@@ -2,17 +2,18 @@
 
 SQLITE_EXTENSION_INIT1
 
-
 static void emaFinalize(sqlite3_context *context) {}
 static void inverse(sqlite3_context *context, int, sqlite3_value **value) {}
-static void destroy(void *context) {  }
+static void destroy(void *context) {}
 
 typedef struct {
     int count;
     int window;
     double sum;
     double *values;
-}SmaContext;
+} SmaContext;
+
+inline double keep3digits(double value) { return (int)(value * 1000) / 1000.0; }
 
 static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
     if (argc != 2) {
@@ -45,7 +46,7 @@ static void smaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
 }
 static void smaValue(sqlite3_context *context) {
     SmaContext *smaContext = (SmaContext *)sqlite3_aggregate_context(context, sizeof(SmaContext));
-    sqlite3_result_double(context, smaContext->sum / smaContext->count);
+    sqlite3_result_double(context, keep3digits(smaContext->sum / smaContext->count));
 }
 static void smaFinalize(sqlite3_context *context) {
     SmaContext *smaContext = (SmaContext *)sqlite3_aggregate_context(context, sizeof(SmaContext));
@@ -79,27 +80,29 @@ static void emaStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
 
 static void emaValue(sqlite3_context *context) {
     EmaContext *emaCtx = (EmaContext *)sqlite3_aggregate_context(context, sizeof(EmaContext));
-    sqlite3_result_double(context, emaCtx->ema);
+    sqlite3_result_double(context, keep3digits(emaCtx->ema));
 }
 
-typedef struct{
+typedef struct {
     sqlite3_value *value;
-}SelectContext;
+} SelectContext;
 
 static void firstStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
-    SelectContext *selectContext = (SelectContext *)sqlite3_aggregate_context(context, sizeof(SelectContext));
-    if(selectContext->value == 0 ){
+    SelectContext *selectContext =
+        (SelectContext *)sqlite3_aggregate_context(context, sizeof(SelectContext));
+    if (selectContext->value == 0) {
         selectContext->value = sqlite3_value_dup(argv[0]);
     }
-    
 }
 static void lastStep(sqlite3_context *context, int argc, sqlite3_value **argv) {
-    SelectContext *selectContext = (SelectContext *)sqlite3_aggregate_context(context, sizeof(SelectContext));
+    SelectContext *selectContext =
+        (SelectContext *)sqlite3_aggregate_context(context, sizeof(SelectContext));
     sqlite3_value_free(selectContext->value);
     selectContext->value = sqlite3_value_dup(argv[0]);
 }
 static void selectFinalize(sqlite3_context *context) {
-    SelectContext *selectContext = (SelectContext *)sqlite3_aggregate_context(context, sizeof(SelectContext));
+    SelectContext *selectContext =
+        (SelectContext *)sqlite3_aggregate_context(context, sizeof(SelectContext));
     sqlite3_result_value(context, selectContext->value);
     sqlite3_value_free(selectContext->value);
 }
@@ -110,8 +113,8 @@ int sqlite3_extension_init(sqlite3 *db, char **err, const sqlite3_api_routines *
                                    inverse, destroy);
     sqlite3_create_window_function(db, "ema", 2, SQLITE_UTF8, 0, emaStep, emaFinalize, emaValue,
                                    inverse, destroy);
-    sqlite3_create_function(db, "first", 1, SQLITE_UTF8, 0, 0,firstStep,selectFinalize);
-    sqlite3_create_function(db, "last", 1, SQLITE_UTF8, 0, 0,lastStep,selectFinalize);
+    sqlite3_create_function(db, "first", 1, SQLITE_UTF8, 0, 0, firstStep, selectFinalize);
+    sqlite3_create_function(db, "last", 1, SQLITE_UTF8, 0, 0, lastStep, selectFinalize);
     return SQLITE_OK;
 }
 
